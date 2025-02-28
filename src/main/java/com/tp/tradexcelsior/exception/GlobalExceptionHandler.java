@@ -5,13 +5,24 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.tp.tradexcelsior.dto.response.CommonResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.util.HashMap;
+import java.util.Map;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Handle Book Not Found Exception
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleBookNotFoundException(BookNotFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
   // Handle UserNotFoundException
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<CommonResponse> handleUserNotFoundException(UserNotFoundException ex) {
@@ -33,6 +44,13 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
   }
 
+    // Handle Invalid Book Data Exception
+    @ExceptionHandler(InvalidBookException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidBookException(InvalidBookException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
   // Handle malformed JSON (HttpMessageNotReadableException)
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<CommonResponse> handleMalformedJson(HttpMessageNotReadableException ex) {
@@ -40,6 +58,16 @@ public class GlobalExceptionHandler {
     CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
     return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
   }
+
+    // Handle Validation Errors (e.g., @NotBlank)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 
   // Handle JSON parse exception (e.g., invalid JSON format, trailing commas)
   @ExceptionHandler(JsonParseException.class)
@@ -56,6 +84,13 @@ public class GlobalExceptionHandler {
     CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
     return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
   }
+    // Generic Exception Handling
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Something went wrong: " + ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
   // Handle IllegalArgumentException (bad requests)
   @ExceptionHandler(IllegalArgumentException.class)
@@ -63,6 +98,12 @@ public class GlobalExceptionHandler {
     CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
   }
+
+
+    @ExceptionHandler(DuplicateBookException.class)
+    public ResponseEntity<String> handleDuplicateBookException(DuplicateBookException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 
   // Handle RuntimeException (generic exception handler)
   @ExceptionHandler(RuntimeException.class)
