@@ -7,12 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,6 +34,28 @@ public class GlobalExceptionHandler {
         CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
     }
+    
+  // Handle SuccessStoryAlreadyExistsException
+  @ExceptionHandler(SuccessStoryAlreadyExistsException.class)
+  public ResponseEntity<CommonResponse> handleSuccessStoryAlreadyExistsException(SuccessStoryAlreadyExistsException ex) {
+    // You can customize the error message further, if needed
+    CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<CommonResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    StringBuilder message = new StringBuilder();
+    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+      message.append(error.getField())
+          .append(": ")
+          .append(error.getDefaultMessage())
+          .append("; ");
+    }
+
+    CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), message.toString());
+    return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
+  }
 
     // Handle ValidationException
     @ExceptionHandler(ValidationException.class)
