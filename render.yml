@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: spring-boot-app  # Change this to your app's name
+    env: java
+    plan: free  # Use free tier
+    buildCommand: "./mvnw clean package"
+    startCommand: "java -jar target/*.jar"
+    envVars:
+      - key: JAVA_VERSION
+        value: 21   # Use the correct Java version
+      - key: MAVEN_VERSION
+        value: 3.8.6  # Adjust based on your Maven version
