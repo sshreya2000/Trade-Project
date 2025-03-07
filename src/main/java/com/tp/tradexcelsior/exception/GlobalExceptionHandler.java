@@ -10,6 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -73,12 +76,12 @@ public class GlobalExceptionHandler {
     }
 
     // Handle malformed JSON (HttpMessageNotReadableException)
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<CommonResponse> handleMalformedJson(HttpMessageNotReadableException ex) {
-        String errorMessage = "Malformed JSON request. Please check your syntax and ensure proper formatting.";
-        CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
-        return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<CommonResponse> handleMalformedJson(HttpMessageNotReadableException ex) {
+//        String errorMessage = "Malformed JSON request. Please check your syntax and ensure proper formatting.";
+//        CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
+//        return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
+//    }
 
     // Handle JSON parse exception (e.g., invalid JSON format, trailing commas)
     @ExceptionHandler(JsonParseException.class)
@@ -148,19 +151,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<CommonResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        StringBuilder message = new StringBuilder();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            message.append(error.getField())
-                    .append(": ")
-                    .append(error.getDefaultMessage())
-                    .append("; ");
-        }
-
-        CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), message.toString());
-        return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<CommonResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+//        StringBuilder message = new StringBuilder();
+//        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+//            message.append(error.getField())
+//                    .append(": ")
+//                    .append(error.getDefaultMessage())
+//                    .append("; ");
+//        }
+//
+//        CommonResponse commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), message.toString());
+//        return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(ReferenceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleReferenceNotFoundException(ReferenceNotFoundException ex) {
